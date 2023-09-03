@@ -1,0 +1,65 @@
+#/bin/bash
+
+if [ $# -le 0 ] ; then
+  echo no task
+  exit 
+fi
+
+projPath=$(dirname $(realpath $(dirname $0)))
+buildPath="$projPath/build"
+libuvPath="D:/App/libuv"
+appPath="$projPath/app"
+
+makesure_path() {
+  if [ ! -d $1 ]; then
+    mkdir $1
+  fi
+}
+
+#compile and build
+build() {
+
+  makesure_path $buildPath
+  curBuildPath=$buildPath/$1
+  makesure_path $curBuildPath
+
+  cd $curBuildPath
+
+  cmake \
+    -DcplOption=$1 \
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_CXX_COMPILER=clang \
+    -G "Unix Makefiles" ../..
+
+  make
+}
+
+# build runnable app
+buildApp() {
+  makesure_path $appPath
+
+  # copy libuv.dll
+  if [ ! -e $appPath/libuv.dll ]; then 
+    cp $libuvPath/libuv.dll $appPath/libuv.dll
+  fi
+
+  mv $buildPath/$1/$1.exe $appPath/
+}
+
+# run option
+case $1 in 
+  "main")
+  build main
+  buildApp main
+  ;;
+  "cli")
+  build cli
+  buildApp cli
+  ;;
+  "clean")
+  rm -r $projPath/build
+  ;;
+  *)
+    echo "no such command"
+  ;;
+esac
