@@ -32,6 +32,7 @@ uv_loop_t* loop;
 uv_tcp_t addr;
 
 void echo_read(uv_stream_t* stream, ssize_t size, const uv_buf_t* buf) {
+  printf("%s \n", buf->base);
   printf("read \n");
 }
 
